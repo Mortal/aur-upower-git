@@ -1,0 +1,36 @@
+commit ce4e48873b2444511ae0c4bdebc5ccd19e931f0d
+Author: Mathias Rav <m@git.strova.dk>
+Date:   Sat May 8 17:18:25 2021 +0200
+
+    Ignore BAT1
+
+diff --git a/src/linux/up-backend.c b/src/linux/up-backend.c
+index e17a946..c1891ea 100644
+--- a/src/linux/up-backend.c
++++ b/src/linux/up-backend.c
+@@ -98,6 +98,7 @@ up_backend_device_new (UpBackend *backend, GUdevDevice *native)
+ {
+ 	const gchar *subsys;
+ 	const gchar *native_path;
++	const gchar *name;
+ 	UpDevice *device = NULL;
+ 	UpInput *input;
+ 	gboolean ret;
+@@ -108,8 +109,15 @@ up_backend_device_new (UpBackend *backend, GUdevDevice *native)
+ 		/* are we a valid power supply */
+ 		device = UP_DEVICE (up_device_supply_new ());
+ 		ret = up_device_coldplug (device, backend->priv->daemon, G_OBJECT (native));
+-		if (ret)
+-			goto out;
++		if (ret) {
++			name = g_udev_device_get_name (native);
++			/* ignore BAT1 because it's broken on my laptop */
++			if (g_strcmp0 (name, "BAT1")) {
++				goto out;
++			} else {
++				g_warning ("ignoring new power_supply '%s'", name);
++			}
++		}
+ 
+ 		/* no valid power supply object */
+ 		g_clear_object (&device);

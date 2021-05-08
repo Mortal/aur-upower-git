@@ -14,8 +14,9 @@ makedepends=('intltool' 'docbook-xsl' 'gobject-introspection' 'python2' 'gtk-doc
 provides=("$_pkgname=${pkgver%%.r*}-${pkgrel}")
 conflicts=("$_pkgname")
 backup=('etc/UPower/UPower.conf')
-source=("$pkgname::git://anongit.freedesktop.org/upower")
-md5sums=('SKIP')
+source=("$pkgname::git://anongit.freedesktop.org/upower" ignore-BAT1.patch)
+md5sums=('SKIP'
+         '95991de24ba57bdb9add422a41d480a5')
 
 pkgver() {
   cd $pkgname
@@ -24,6 +25,7 @@ pkgver() {
 
 prepare() {
   cd $pkgname
+  patch -p1 < ../ignore-BAT1.patch
   NOCONFIGURE=true ./autogen.sh
 }
 
